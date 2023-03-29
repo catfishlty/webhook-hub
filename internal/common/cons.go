@@ -10,7 +10,7 @@ func SuccessResponse() gin.H {
 	}
 }
 
-func SuccessMsgResponse(msg string) gin.H {
+func MsgResponse(msg string) gin.H {
 	return gin.H{
 		"message": msg,
 	}

@@ -3,8 +3,26 @@ package data
 import (
 	"github.com/catfishlty/webhooks-hub/internal/common"
 	"github.com/catfishlty/webhooks-hub/internal/types"
+	"github.com/catfishlty/webhooks-hub/internal/utils"
 	"gorm.io/gorm"
 )
+
+func CheckUser(db *gorm.DB, username, shaPassword string) (*types.User, error) {
+	var user types.User
+	result := db.Where("username = ? and password = ?", username, shaPassword).First(&user)
+	return &user, result.Error
+}
+
+func CreateUser(db *gorm.DB, username, password string) error {
+	result := db.Create(&types.User{
+		Id:        utils.UUID(),
+		Username:  common.DefaultUsername,
+		Password:  utils.Sha256(common.DefaultPassword),
+		AccessKey: utils.NewRandom().String(16),
+		SecretKey: utils.NewRandom().String(32),
+	})
+	return result.Error
+}
 
 func GetRule(db *gorm.DB, id string) (types.Rule, error) {
 	var rule types.Rule

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/catfishlty/webhooks-hub/internal/api"
+	"github.com/catfishlty/webhooks-hub/internal/utils"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 	"gorm.io/driver/sqlite"
@@ -19,8 +20,9 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to connect database")
 	}
-	hub := api.NewHub(db)
-	hub.Migrate()
+	secretKey := utils.GetSecretKey("")
+	hub := api.NewHub(db, secretKey)
+	hub.Init()
 	g.Go(func() error {
 		return hub.Server(port).ListenAndServe()
 	})
