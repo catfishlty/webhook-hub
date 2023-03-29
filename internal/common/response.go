@@ -2,8 +2,6 @@ package common
 
 import "github.com/gin-gonic/gin"
 
-const PageSize = 20
-
 func SuccessResponse() gin.H {
 	return gin.H{
 		"message": "ok",

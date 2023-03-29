@@ -16,11 +16,30 @@ func CheckUser(db *gorm.DB, username, shaPassword string) (*types.User, error) {
 func CreateUser(db *gorm.DB, username, password string) error {
 	result := db.Create(&types.User{
 		Id:        utils.UUID(),
-		Username:  common.DefaultUsername,
-		Password:  utils.Sha256(common.DefaultPassword),
+		Username:  username,
+		Password:  utils.Sha256(password),
 		AccessKey: utils.NewRandom().String(16),
 		SecretKey: utils.NewRandom().String(32),
 	})
+	return result.Error
+}
+
+func GetUser(db *gorm.DB, id string) (types.User, error) {
+	var user types.User
+	result := db.Where("id = ?", id).First(&user)
+	return user, result.Error
+}
+
+func GetUserList(db *gorm.DB, page, pageSize int) ([]types.User, int64, error) {
+	var users []types.User
+	result := db.Offset((page - 1) * pageSize).Limit(pageSize).Find(&users)
+	var count int64
+	db.Model(&types.User{}).Count(&count)
+	return users, count, result.Error
+}
+
+func UpdateUser(db *gorm.DB, id string, request types.User) error {
+	result := db.Model(&types.User{}).Where("id = ?", id).Updates(request)
 	return result.Error
 }
 
