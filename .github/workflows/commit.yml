@@ -1,4 +1,4 @@
-name: PR Building
+name: Commit Building
 
 on:
   commit:
