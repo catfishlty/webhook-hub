@@ -13,3 +13,7 @@ func UUID() string {
 func Sha256(str string) string {
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(str)))
 }
+
+func EncodePassword(pass, salt string) string {
+	return Sha256(Sha256(salt+pass) + salt)
+}

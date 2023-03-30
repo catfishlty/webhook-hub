@@ -3,11 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/alexflint/go-arg"
-	"github.com/catfishlty/webhooks-hub/internal/api"
 	"github.com/catfishlty/webhooks-hub/internal/common"
 	"github.com/catfishlty/webhooks-hub/internal/data"
-	"github.com/catfishlty/webhooks-hub/internal/types"
-	"github.com/catfishlty/webhooks-hub/internal/utils"
+	"github.com/catfishlty/webhooks-hub/internal/hub"
 	"github.com/onrik/gorm-logrus"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
@@ -27,7 +25,7 @@ func main() {
 		p.Fail("failed to connect to database")
 		os.Exit(1)
 	}
-	db, err := gorm.Open(dbInstance, &gorm.Config{
+	orm, err := gorm.Open(dbInstance, &gorm.Config{
 		Logger: gorm_logrus.New(),
 	})
 	if err != nil {
@@ -36,10 +34,9 @@ func main() {
 	switch {
 	case args.StartCommand != nil:
 		log.Debugf("command: Start")
-		hub := api.NewHub(db, utils.GetSecretKey(args.StartCommand.SecretKey))
-		hub.Init()
+		webhookHub := hub.NewHub(orm, args.StartCommand.SecretKey, args.StartCommand.Salt)
 		g.Go(func() error {
-			return hub.Server(args.StartCommand.Port).ListenAndServe()
+			return webhookHub.Server(args.StartCommand.Port).ListenAndServe()
 		})
 		if err := g.Wait(); err != nil {
 			log.Errorf("server start failed: %v", err)
@@ -50,7 +47,8 @@ func main() {
 		switch {
 		case args.AdminCommand.ListCommand != nil:
 			log.Debugf("command: Admin List")
-			users, total, err := data.GetUserList(db, 1, common.PageSizeMax)
+			db := data.NewDB(orm, "")
+			users, total, err := db.GetUserList(1, common.PageSizeMax)
 			if err != nil {
 				p.Fail("failed to get user list")
 				os.Exit(1)
@@ -69,9 +67,8 @@ func main() {
 				p.Fail("password is empty")
 				os.Exit(1)
 			}
-			err = data.UpdateUser(db, args.AdminCommand.ResetCommand.Id, types.User{
-				Password: utils.Sha256(args.AdminCommand.ResetCommand.Password),
-			})
+			db := data.NewDB(orm, args.AdminCommand.ResetCommand.Salt)
+			err = db.UpdatePasswordAdmin(args.AdminCommand.ResetCommand.Id, args.AdminCommand.ResetCommand.Password)
 			if err != nil {
 				p.Fail(fmt.Sprintf("failed to reset user '%s'", args.AdminCommand.ResetCommand.Id))
 				os.Exit(1)

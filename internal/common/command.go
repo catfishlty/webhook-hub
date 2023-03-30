@@ -8,6 +8,7 @@ import (
 type StartCommand struct {
 	Port      int    `arg:"-p,--port" default:"8080" help:"http server port"`
 	SecretKey string `arg:"-k,--key" default:"" help:"secret key for jwt"`
+	Salt      string `arg:"-s,--salt" default:"" help:"salt for password"`
 	LogLevel  string `arg:"-l,--log" default:"info" help:"log level(debug, info, warn, error, fatal, panic)"`
 }
 
@@ -17,6 +18,7 @@ type AdminListCommand struct {
 type AdminResetCommand struct {
 	Id       string `arg:"-i,--id" help:"user id"`
 	Password string `arg:"-p,--password" help:"password"`
+	Salt     string `arg:"-s,--salt" default:"" help:"salt for password"`
 }
 
 type AdminCommand struct {

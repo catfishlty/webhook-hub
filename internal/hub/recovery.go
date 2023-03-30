@@ -1,4 +1,4 @@
-package api
+package hub
 
 import (
 	"github.com/catfishlty/webhooks-hub/internal/types"
@@ -7,15 +7,15 @@ import (
 	"net/http"
 )
 
-func webhookErrorHandler() gin.HandlerFunc {
-	return commonErrorHandler("Webhook")
+func (hub *Hub) webhookErrorHandler() gin.HandlerFunc {
+	return hub.commonErrorHandler("Webhook")
 }
 
-func adminErrorHandler() gin.HandlerFunc {
-	return commonErrorHandler("Admin")
+func (hub *Hub) adminErrorHandler() gin.HandlerFunc {
+	return hub.commonErrorHandler("Admin")
 }
 
-func commonErrorHandler(errorType string) gin.HandlerFunc {
+func (*Hub) commonErrorHandler(errorType string) gin.HandlerFunc {
 	return gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
 		if customError := recovered.(*types.CommonError); customError != nil {
 			msg := customError.Msg

@@ -10,3 +10,5 @@ const DBTypeSqlite = "sqlite"
 const DBTypeMySQL = "mysql"
 const DBTypePostgres = "postgres"
 const DBTypeSQLServer = "sqlserver"
+
+const JwtRealm = "webhook-hub"

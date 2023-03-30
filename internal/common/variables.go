@@ -1,5 +1,5 @@
 package common
 
-var SecretKeyFile = "secret.key"
+var ConfigFile = "config.yml"
 var DefaultUsername = "admin"
 var DefaultPassword = "admin"

@@ -1,18 +1,16 @@
-package api
+package hub
 
 import (
 	"fmt"
-	"github.com/catfishlty/webhooks-hub/internal/data"
 	"github.com/catfishlty/webhooks-hub/internal/types"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"net/http"
 )
 
-func webhookHandler(db *gorm.DB, sender *Sender) func(c *gin.Context) {
+func (hub *Hub) webhookHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		rule, err := data.GetRule(db, id)
+		rule, err := hub.db.GetRule(id)
 		if err != nil {
 			panic(&types.CommonError{
 				Code: http.StatusNotFound,
@@ -20,7 +18,7 @@ func webhookHandler(db *gorm.DB, sender *Sender) func(c *gin.Context) {
 			})
 			return
 		}
-		resp, err := sender.Send(rule.Send)
+		resp, err := hub.sender.Send(rule.Send)
 		if err != nil {
 			panic(&types.CommonError{
 				Code: resp.StatusCode(),

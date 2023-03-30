@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/catfishlty/webhooks-hub/internal/common"
+	"github.com/catfishlty/webhooks-hub/internal/types"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -25,4 +26,10 @@ func GetSecretKey(inputSecretKey string) string {
 	}
 	log.Debugf("using random secret key: %s, and save to %s", secretKey, common.SecretKeyFile)
 	return secretKey
+}
+
+func GetConfig(inputSecretKey, inputSalt string) *types.Config {
+	return &common.Config{
+		SecretKey: GetSecretKey(inputSecretKey),
+	}
 }

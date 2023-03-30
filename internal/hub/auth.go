@@ -1,23 +1,20 @@
-package api
+package hub
 
 import (
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/catfishlty/webhooks-hub/internal/common"
-	"github.com/catfishlty/webhooks-hub/internal/data"
 	"github.com/catfishlty/webhooks-hub/internal/types"
-	"github.com/catfishlty/webhooks-hub/internal/utils"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"time"
 )
 
 const identityKey = "id"
 
-func getAuthMiddleware(db *gorm.DB, realm, secretKey string) *jwt.GinJWTMiddleware {
+func (hub *Hub) getAuthMiddleware(secretKey string, jwtRealm string) *jwt.GinJWTMiddleware {
 	// the jwt middleware
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       realm,
+		Realm:       jwtRealm,
 		Key:         []byte(secretKey),
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
@@ -43,7 +40,7 @@ func getAuthMiddleware(db *gorm.DB, realm, secretKey string) *jwt.GinJWTMiddlewa
 			}
 			username := loginVals.Username
 			password := loginVals.Password
-			user, err := data.CheckUser(db, username, utils.Sha256(password))
+			user, err := hub.db.CheckUser(username, password)
 			if err != nil || user == nil {
 				log.Debugf("login failed: %s, %s", username, err.Error())
 				return nil, jwt.ErrFailedAuthentication
