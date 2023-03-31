@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
-	"strconv"
 )
 
 type Hub struct {
@@ -64,9 +63,9 @@ func (hub *Hub) initRouter(secretKey string) {
 	hub.router = r
 }
 
-func (hub *Hub) Server(port int) *http.Server {
+func (hub *Hub) Server(port string) *http.Server {
 	return &http.Server{
-		Addr:    ":" + strconv.Itoa(port),
+		Addr:    ":" + port,
 		Handler: hub.router,
 	}
 }

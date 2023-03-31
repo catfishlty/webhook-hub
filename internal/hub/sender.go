@@ -13,7 +13,10 @@ type Sender struct {
 }
 
 func (s *Sender) Send(send types.SendRequest) (*resty.Response, error) {
-	r := s.resty.R().SetHeaders(utils.JsonToStringMap(send.Header)).SetQueryParams(utils.JsonToStringMap(send.Query)).SetBody(send.Body)
+	r := s.resty.R().
+		SetHeaders(utils.JsonToStringMap(send.Header)).
+		SetQueryParams(utils.JsonToStringMap(send.Query)).
+		SetBody(send.Body)
 	switch send.Method {
 	case http.MethodGet:
 		return r.Get(send.Url)

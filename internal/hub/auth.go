@@ -2,6 +2,7 @@ package hub
 
 import (
 	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/catfishlty/webhooks-hub/internal/check"
 	"github.com/catfishlty/webhooks-hub/internal/common"
 	"github.com/catfishlty/webhooks-hub/internal/types"
 	"github.com/gin-gonic/gin"
@@ -40,6 +41,11 @@ func (hub *Hub) getAuthMiddleware(secretKey string, jwtRealm string) *jwt.GinJWT
 			}
 			username := loginVals.Username
 			password := loginVals.Password
+			err := check.UsernamePassword(username, password)
+			if err != nil {
+				log.Debugf("login failed: %s, %s", username, err.Error())
+				return nil, jwt.ErrFailedAuthentication
+			}
 			user, err := hub.db.CheckUser(username, password)
 			if err != nil || user == nil {
 				log.Debugf("login failed: %s, %s", username, err.Error())

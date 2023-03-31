@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/alexflint/go-arg"
+	"github.com/catfishlty/webhooks-hub/exp"
 	"github.com/catfishlty/webhooks-hub/internal/common"
 	"github.com/catfishlty/webhooks-hub/internal/data"
 	"github.com/catfishlty/webhooks-hub/internal/hub"
@@ -20,17 +21,13 @@ var (
 func main() {
 	var args common.Command
 	p := arg.MustParse(&args)
+	exp.HandleCmd(p, args.Validate())
 	dbInstance, err := data.GetDatabase(args.DBType, args.DBPath)
-	if err != nil {
-		p.Fail("failed to connect to database")
-		os.Exit(1)
-	}
+	exp.HandleCmdWithMsg(p, err, "failed to create database instance")
 	orm, err := gorm.Open(dbInstance, &gorm.Config{
 		Logger: gorm_logrus.New(),
 	})
-	if err != nil {
-		p.Fail("failed to connect database")
-	}
+	exp.HandleCmdWithMsg(p, err, "failed to connect database")
 	switch {
 	case args.StartCommand != nil:
 		log.Debugf("command: Start")
@@ -49,24 +46,16 @@ func main() {
 			log.Debugf("command: Admin List")
 			db := data.NewDB(orm, "")
 			users, total, err := db.GetUserList(1, common.PageSizeMax)
-			if err != nil {
-				p.Fail("failed to get user list")
-				os.Exit(1)
-			}
+			exp.HandleCmdWithMsg(p, err, "failed to get user list")
 			fmt.Printf("total users: %d\n", total)
 			for idx, user := range users {
 				fmt.Printf("%3d - user: id='%s', name='%s'", idx, user.Id, user.Username)
 			}
 		case args.AdminCommand.ResetCommand != nil:
 			log.Debugf("command: Admin Reset")
-			if args.AdminCommand.ResetCommand.Id == "" {
-				p.Fail("user id is empty")
-				os.Exit(1)
-			}
-			if args.AdminCommand.ResetCommand.Password == "" {
-				p.Fail("password is empty")
-				os.Exit(1)
-			}
+			exp.HandleCmdCondition(p, args.AdminCommand.ResetCommand.Id == "", "user id is empty")
+			exp.HandleCmdWithMsg(p, err, "failed to get user list")
+			exp.HandleCmdCondition(p, args.AdminCommand.ResetCommand.Password == "", "password is empty")
 			db := data.NewDB(orm, args.AdminCommand.ResetCommand.Salt)
 			err = db.UpdatePasswordAdmin(args.AdminCommand.ResetCommand.Id, args.AdminCommand.ResetCommand.Password)
 			if err != nil {
