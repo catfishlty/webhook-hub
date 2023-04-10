@@ -33,7 +33,7 @@ func HandleCmdCondition(p *arg.Parser, cond bool, msg string) {
 func HandleBindJSON(err error) {
 	if err != nil {
 		log.Warnf("bind json failed: %v", err)
-		panic(types.CommonError{
+		panic(&types.CommonError{
 			Code: http.StatusBadRequest,
 			Msg:  "bind json failed",
 		})
@@ -43,7 +43,7 @@ func HandleBindJSON(err error) {
 func HandleRequestInvalid(err error) {
 	if err != nil {
 		log.Debugf("request validate failed: %v", err)
-		panic(types.CommonError{
+		panic(&types.CommonError{
 			Code: http.StatusBadRequest,
 			Msg:  err.Error(),
 		})
@@ -53,7 +53,7 @@ func HandleRequestInvalid(err error) {
 func HandleDB(err error, msg string) {
 	if err != nil {
 		log.Errorf("%s : %v", msg, err)
-		panic(types.CommonError{
+		panic(&types.CommonError{
 			Code: http.StatusInternalServerError,
 			Msg:  msg,
 		})

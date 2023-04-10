@@ -3,6 +3,7 @@ package check
 import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
+	"strconv"
 )
 
 func UsernamePassword(username, password string) error {
@@ -17,5 +18,10 @@ func ValidateId(id string) error {
 }
 
 func ValidatePage(page string) error {
-	return validation.Validate(&page, validation.Required, is.Int, validation.Min(1))
+	err := validation.Validate(&page, validation.Required, is.Int)
+	if err != nil {
+		return err
+	}
+	pageCount, _ := strconv.Atoi(page)
+	return validation.Validate(pageCount, validation.Required, validation.Min(1))
 }

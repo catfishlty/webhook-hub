@@ -25,9 +25,9 @@ func (*Hub) commonErrorHandler(errorType string) gin.HandlerFunc {
 				msg = "Unknown error"
 			}
 			c.JSON(customError.Code, gin.H{
-				"message": customError.Msg,
+				"message": msg,
 			})
-			log.Errorf("[%s] code=%d, msg=%s", errorType, customError.Code, customError.Msg)
+			log.Errorf("[%s] code=%d, msg=%s", errorType, customError.Code, msg)
 			return
 		}
 		if baseErr := recovered.(error); baseErr != nil {

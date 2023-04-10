@@ -3,7 +3,6 @@ package hub
 import (
 	"errors"
 	"github.com/catfishlty/webhooks-hub/internal/types"
-	"github.com/catfishlty/webhooks-hub/internal/utils"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 )
@@ -12,11 +11,15 @@ type Sender struct {
 	resty *resty.Client
 }
 
-func (s *Sender) Send(send types.SendRequest) (*resty.Response, error) {
+func (s *Sender) Send(send types.RestySendRequest) (*resty.Response, error) {
 	r := s.resty.R().
-		SetHeaders(utils.JsonToStringMap(send.Header)).
-		SetQueryParams(utils.JsonToStringMap(send.Query)).
-		SetBody(send.Body)
+		SetHeaders(send.Header).
+		SetQueryParams(send.Query)
+	if send.IsForm {
+		r.SetFormData(send.Form)
+	} else {
+		r.SetBody(send.Body)
+	}
 	switch send.Method {
 	case http.MethodGet:
 		return r.Get(send.Url)

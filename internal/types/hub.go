@@ -11,7 +11,14 @@ type ReceiveRequest struct {
 	ID        string            `json:"id"`
 	Method    string            `json:"method"`
 	Variables datatypes.JSONMap `json:"variables"`
-	Validator datatypes.JSONMap `json:"Validator"`
+}
+
+type VariableItem struct {
+	Key      string `json:"key"`
+	Assign   string `json:"assign"`
+	Validate string `json:"validate"`
+	Value    string `json:"-"`
+	Type     string `json:"-"`
 }
 
 func (r ReceiveRequest) Validate() error {
@@ -26,13 +33,43 @@ func (r ReceiveRequest) ValidateFunc() func(interface{}) error {
 	}
 }
 
+type SendBase struct {
+	ID     string `json:"id"`
+	Url    string `json:"url"`
+	Method string `json:"method"`
+	IsForm bool   `json:"isForm"`
+	Body   string `json:"body"`
+}
+
 type SendRequest struct {
-	ID     string            `json:"id"`
-	Url    string            `json:"url"`
-	Method string            `json:"method"`
+	SendBase
 	Header datatypes.JSONMap `json:"header"`
 	Query  datatypes.JSONMap `json:"query"`
-	Body   string            `json:"body"`
+	Form   datatypes.JSONMap `json:"form"`
+}
+
+func (r SendRequest) ToResty() RestySendRequest {
+	return RestySendRequest{
+		SendBase: r.SendBase,
+		Header:   JsonToStringMap(r.Header),
+		Query:    JsonToStringMap(r.Query),
+		Form:     JsonToStringMap(r.Form),
+	}
+}
+
+func JsonToStringMap(data datatypes.JSONMap) map[string]string {
+	m := make(map[string]string)
+	for k, v := range data {
+		m[k] = v.(string)
+	}
+	return m
+}
+
+type RestySendRequest struct {
+	SendBase
+	Header map[string]string `json:"header"`
+	Query  map[string]string `json:"query"`
+	Form   map[string]string `json:"form"`
 }
 
 func (r SendRequest) Validate() error {
@@ -71,18 +108,19 @@ type RuleItem struct {
 	Description string `json:"description"`
 	GroupId     string `json:"groupId"`
 	IsAuth      bool   `json:"isAuth"`
+	IsForward   bool   `json:"isForward"`
 }
 
 func (r RuleItem) Validate() error {
 	return validation.ValidateStruct(&r,
-		validation.Field(&r.ID, validation.Required, is.UUIDv4),
-		validation.Field(&r.Name, validation.Required, validation.Min(1)),
+		validation.Field(&r.ID, is.UUIDv4),
+		validation.Field(&r.Name, validation.Required, validation.Length(1, 50)),
 		validation.Field(&r.IsAuth, validation.Required, validation.In(true, false)),
 	)
 }
 
-func (r RuleItem) ValidateFunc() func(interface{}) error {
-	return func(interface{}) error {
+func (r RuleItem) ValidateFunc() func(any) error {
+	return func(any) error {
 		return r.Validate()
 	}
 }

@@ -3,7 +3,9 @@ package hub
 import (
 	"fmt"
 	"github.com/catfishlty/webhooks-hub/internal/types"
+	"github.com/catfishlty/webhooks-hub/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-resty/resty/v2"
 	"net/http"
 )
 
@@ -18,7 +20,21 @@ func (hub *Hub) webhookHandler() func(c *gin.Context) {
 			})
 			return
 		}
-		resp, err := hub.sender.Send(rule.Send)
+		variables, data, err := utils.GetVariables(rule.Receive, c)
+		if err != nil {
+			panic(&types.CommonError{
+				Code: http.StatusBadRequest,
+				Err:  err,
+			})
+		}
+		err = utils.ValidateVariables(variables)
+		if err != nil {
+			panic(&types.CommonError{
+				Code: http.StatusBadRequest,
+				Err:  err,
+			})
+		}
+		resp, err := hub.sendRequest(rule, variables, data)
 		if err != nil {
 			panic(&types.CommonError{
 				Code: resp.StatusCode(),
@@ -32,4 +48,10 @@ func (hub *Hub) webhookHandler() func(c *gin.Context) {
 		}
 		c.String(resp.StatusCode(), resp.String())
 	}
+}
+
+func (hub *Hub) sendRequest(rule types.Rule, variables map[string]types.VariableItem, data []byte) (*resty.Response, error) {
+	send := rule.Send.ToResty()
+	utils.ReplaceVariables(&send, variables)
+	return hub.sender.Send(send)
 }
