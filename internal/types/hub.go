@@ -37,7 +37,6 @@ type SendBase struct {
 	Url    string `json:"url"`
 	Method string `json:"method"`
 	IsForm bool   `json:"isForm"`
-	Body   string `json:"body"`
 }
 
 type SendRequest struct {
@@ -45,6 +44,7 @@ type SendRequest struct {
 	Header datatypes.JSONMap `json:"header"`
 	Query  datatypes.JSONMap `json:"query"`
 	Form   datatypes.JSONMap `json:"form"`
+	Body   datatypes.JSONMap `json:"body"`
 }
 
 func (r SendRequest) ToResty() RestySendRequest {
@@ -53,6 +53,7 @@ func (r SendRequest) ToResty() RestySendRequest {
 		Header:   JsonToStringMap(r.Header),
 		Query:    JsonToStringMap(r.Query),
 		Form:     JsonToStringMap(r.Form),
+		Body:     r.Body,
 	}
 }
 
@@ -69,6 +70,7 @@ type RestySendRequest struct {
 	Header map[string]string `json:"header"`
 	Query  map[string]string `json:"query"`
 	Form   map[string]string `json:"form"`
+	Body   map[string]any    `json:"body"`
 }
 
 func (r SendRequest) Validate() error {

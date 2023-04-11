@@ -2,11 +2,17 @@ package exp
 
 import (
 	"github.com/alexflint/go-arg"
-	"github.com/catfishlty/webhooks-hub/internal/types"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 )
+
+type CommonError struct {
+	Code          int
+	Message       string
+	Err           error
+	IsSystemError bool
+}
 
 func HandleCmd(p *arg.Parser, err error) {
 	if err != nil {
@@ -33,9 +39,9 @@ func HandleCmdCondition(p *arg.Parser, cond bool, msg string) {
 func HandleBindJSON(err error) {
 	if err != nil {
 		log.Warnf("bind json failed: %v", err)
-		panic(&types.CommonError{
-			Code: http.StatusBadRequest,
-			Msg:  "bind json failed",
+		panic(&CommonError{
+			Code:    http.StatusBadRequest,
+			Message: "bind json failed",
 		})
 	}
 }
@@ -43,9 +49,9 @@ func HandleBindJSON(err error) {
 func HandleRequestInvalid(err error) {
 	if err != nil {
 		log.Debugf("request validate failed: %v", err)
-		panic(&types.CommonError{
-			Code: http.StatusBadRequest,
-			Msg:  err.Error(),
+		panic(&CommonError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
 		})
 	}
 }
@@ -53,9 +59,9 @@ func HandleRequestInvalid(err error) {
 func HandleDB(err error, msg string) {
 	if err != nil {
 		log.Errorf("%s : %v", msg, err)
-		panic(&types.CommonError{
-			Code: http.StatusInternalServerError,
-			Msg:  msg,
+		panic(&CommonError{
+			Code:    http.StatusInternalServerError,
+			Message: msg,
 		})
 	}
 }

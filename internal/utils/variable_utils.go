@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"github.com/catfishlty/webhooks-hub/exp"
 	"github.com/catfishlty/webhooks-hub/internal/types"
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"
@@ -138,14 +139,33 @@ func ReplaceVariables(send *types.RestySendRequest, variables map[string]types.V
 	for i, v := range send.Header {
 		send.Header[i] = replaceVariable(v, variables)
 	}
+	for i, v := range send.Query {
+		send.Query[i] = replaceVariable(v, variables)
+	}
+	for k, v := range send.Form {
+		send.Form[k] = replaceVariable(v, variables)
+	}
+	send.Body = replaceJsonVariable(send.Body, variables)
+}
+
+func replaceJsonVariable(v map[string]any, variables map[string]types.VariableItem) map[string]any {
+	jsonData, err := jsoniter.MarshalToString(v)
+	exp.HandleRequestInvalid(err)
+	jsonData = replaceVariable(jsonData, variables)
+	var m map[string]any
+	err = jsoniter.Unmarshal([]byte(jsonData), &m)
+	exp.HandleRequestInvalid(err)
+	return m
 }
 
 func replaceVariable(v string, variables map[string]types.VariableItem) string {
-	r := regexp.MustCompile(`\$\{(.+?)\}`)
+	r := regexp.MustCompile(`\$\{(.+?)}`)
 	if r.MatchString(v) {
 		matches := r.FindAllString(v, -1)
 		for _, match := range matches {
-			return strings.ReplaceAll(v, match, variables[match[2:len(match)-1]].Value)
+			if variable, ok := variables[match[2:len(match)-1]]; ok {
+				return strings.ReplaceAll(v, match, variable.Value)
+			}
 		}
 	}
 	return v

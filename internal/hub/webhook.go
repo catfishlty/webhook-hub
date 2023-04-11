@@ -2,6 +2,8 @@ package hub
 
 import (
 	"fmt"
+	"github.com/catfishlty/webhooks-hub/exp"
+	"github.com/catfishlty/webhooks-hub/internal/check"
 	"github.com/catfishlty/webhooks-hub/internal/types"
 	"github.com/catfishlty/webhooks-hub/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -14,29 +16,20 @@ func (hub *Hub) webhookHandler() func(c *gin.Context) {
 		id := c.Param("id")
 		rule, err := hub.db.GetRule(id)
 		if err != nil {
-			panic(&types.CommonError{
-				Code: http.StatusNotFound,
-				Msg:  fmt.Sprintf("webhook id: %s not found", id),
+			panic(&exp.CommonError{
+				Code:    http.StatusNotFound,
+				Message: fmt.Sprintf("webhook id: %s not found", id),
 			})
-			return
 		}
+		err = check.ValidateHttpRequest(rule.Receive.Method, c)
+		exp.HandleRequestInvalid(err)
 		variables, data, err := utils.GetVariables(rule.Receive, c)
-		if err != nil {
-			panic(&types.CommonError{
-				Code: http.StatusBadRequest,
-				Err:  err,
-			})
-		}
+		exp.HandleRequestInvalid(err)
 		err = utils.ValidateVariables(variables)
-		if err != nil {
-			panic(&types.CommonError{
-				Code: http.StatusBadRequest,
-				Err:  err,
-			})
-		}
+		exp.HandleRequestInvalid(err)
 		resp, err := hub.sendRequest(rule, variables, data)
 		if err != nil {
-			panic(&types.CommonError{
+			panic(&exp.CommonError{
 				Code: resp.StatusCode(),
 				Err:  err,
 			})
