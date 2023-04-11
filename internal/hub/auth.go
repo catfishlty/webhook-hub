@@ -23,7 +23,7 @@ func (hub *Hub) getAuthMiddleware(secretKey string, jwtRealm string) *jwt.GinJWT
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*types.User); ok {
 				return jwt.MapClaims{
-					identityKey: v.Id,
+					identityKey: v.UID,
 				}
 			}
 			return jwt.MapClaims{}
@@ -31,7 +31,7 @@ func (hub *Hub) getAuthMiddleware(secretKey string, jwtRealm string) *jwt.GinJWT
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
 			return &types.User{
-				Id: claims[identityKey].(string),
+				UID: claims[identityKey].(string),
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
@@ -56,7 +56,7 @@ func (hub *Hub) getAuthMiddleware(secretKey string, jwtRealm string) *jwt.GinJWT
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
 			if v, ok := data.(*types.User); ok {
-				log.Debugf("auth success: %s", v.Id)
+				log.Debugf("auth success: %s", v.UID)
 				return true
 			}
 			return false

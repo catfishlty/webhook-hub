@@ -5,10 +5,10 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 type ReceiveRequest struct {
-	ID        string            `json:"id"`
 	Method    string            `json:"method"`
 	Variables datatypes.JSONMap `json:"variables"`
 }
@@ -34,7 +34,6 @@ func (r ReceiveRequest) ValidateFunc() func(interface{}) error {
 }
 
 type SendBase struct {
-	ID     string `json:"id"`
 	Url    string `json:"url"`
 	Method string `json:"method"`
 	IsForm bool   `json:"isForm"`
@@ -88,10 +87,8 @@ func (r SendRequest) ValidateFunc() func(interface{}) error {
 
 type Rule struct {
 	RuleItem
-	ReceiveId string         `json:"-"`
-	Receive   ReceiveRequest `json:"receive" gorm:"foreignkey:ReceiveId;references:ID"`
-	SendId    string         `json:"-"`
-	Send      SendRequest    `json:"send" gorm:"foreignkey:SendId;references:ID"`
+	Receive ReceiveRequest `json:"receive" gorm:"embedded;embeddedPrefix:receive_"`
+	Send    SendRequest    `json:"send" gorm:"embedded;embeddedPrefix:send_"`
 }
 
 func (r Rule) Validate() error {
@@ -103,8 +100,9 @@ func (r Rule) Validate() error {
 }
 
 type RuleItem struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
+	gorm.Model
+	UID         string `json:"uid" gorm:"unique,not null"`
+	Name        string `json:"name" gorm:"unique,not null"`
 	Description string `json:"description"`
 	GroupId     string `json:"groupId"`
 	IsAuth      bool   `json:"isAuth"`
@@ -113,7 +111,7 @@ type RuleItem struct {
 
 func (r RuleItem) Validate() error {
 	return validation.ValidateStruct(&r,
-		validation.Field(&r.ID, is.UUIDv4),
+		validation.Field(&r.UID, is.UUIDv4),
 		validation.Field(&r.Name, validation.Required, validation.Length(1, 50)),
 		validation.Field(&r.IsAuth, validation.Required, validation.In(true, false)),
 	)
@@ -126,8 +124,9 @@ func (r RuleItem) ValidateFunc() func(any) error {
 }
 
 type User struct {
-	Id        string `json:"id"`
-	Username  string `json:"username"`
+	gorm.Model
+	UID       string `json:"uid" gorm:"unique,not null"`
+	Username  string `json:"username" gorm:"unique,not null"`
 	Password  string `json:"-,"`
 	AccessKey string `json:"accessKey"`
 	SecretKey string `json:"secretKey"`

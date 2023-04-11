@@ -89,14 +89,26 @@ func (hub *Hub) AddRuleHandler() func(c *gin.Context) {
 		err := c.BindJSON(&request)
 		exp.HandleBindJSON(err)
 		exp.HandleRequestInvalid(request.Validate())
-		request.ID = utils.UUID()
-		request.SendId = utils.UUID()
-		request.Send.ID = request.SendId
-		request.ReceiveId = utils.UUID()
-		request.Receive.ID = request.ReceiveId
+		request.UID = utils.UUID()
 		id, err := hub.db.AddRule(request)
 		exp.HandleDB(err, "add rule error")
 		c.JSON(http.StatusOK, common.SingleResponse("id", id))
+	}
+}
+
+func (hub *Hub) UpdateRuleHandler() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		exp.HandleRequestInvalid(check.ValidateId(id))
+		exp.HandleRequestInvalid(hub.db.ExistRule(id))
+		var request types.Rule
+		err := c.BindJSON(&request)
+		request.UID = id
+		exp.HandleBindJSON(err)
+		exp.HandleRequestInvalid(request.Validate())
+		err = hub.db.UpdateRule(request)
+		exp.HandleDB(err, "add rule error")
+		c.Status(http.StatusOK)
 	}
 }
 

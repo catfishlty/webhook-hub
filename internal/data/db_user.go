@@ -14,7 +14,7 @@ func (db *DB) CheckUser(username, password string) (*types.User, error) {
 
 func (db *DB) CreateUser(username, password string) error {
 	result := db.orm.Create(&types.User{
-		Id:        utils.UUID(),
+		UID:       utils.UUID(),
 		Username:  username,
 		Password:  utils.EncodePassword(password, db.salt),
 		AccessKey: utils.NewRandom().String(16),
@@ -25,7 +25,7 @@ func (db *DB) CreateUser(username, password string) error {
 
 func (db *DB) GetUser(id string) (types.User, error) {
 	var user types.User
-	result := db.orm.Where("id = ?", id).First(&user)
+	result := db.orm.Where("uid = ?", id).First(&user)
 	return user, result.Error
 }
 
@@ -45,7 +45,7 @@ func (db *DB) DeleteUser(id string) error {
 	if db.GetUserCount() <= 1 {
 		return errors.New("can't delete user, please ensure there's at least one user")
 	}
-	result := db.orm.Where("id = ?", id).Delete(&types.User{})
+	result := db.orm.Where("uid = ?", id).Delete(&types.User{})
 	return result.Error
 }
 
@@ -53,13 +53,13 @@ func (db *DB) UpdateUser(id string, request types.User) error {
 	if request.Password != "" {
 		request.Password = ""
 	}
-	result := db.orm.Model(&types.User{}).Where("id = ?", id).Updates(request)
+	result := db.orm.Model(&types.User{}).Where("uid = ?", id).Updates(request)
 	return result.Error
 }
 
 func (db *DB) UpdatePassword(id, password, newPassword string) error {
 	result := db.orm.Model(&types.User{}).
-		Where("id = ?", id).
+		Where("uid = ?", id).
 		Where("password = ?", utils.EncodePassword(password, db.salt)).
 		Updates(types.User{
 			Password: utils.EncodePassword(newPassword, db.salt),
@@ -69,7 +69,7 @@ func (db *DB) UpdatePassword(id, password, newPassword string) error {
 
 func (db *DB) UpdatePasswordAdmin(id, password string) error {
 	result := db.orm.Model(&types.User{}).
-		Where("id = ?", id).
+		Where("uid = ?", id).
 		Updates(types.User{
 			Password: utils.EncodePassword(password, db.salt),
 		})

@@ -1,13 +1,15 @@
 package data
 
 import (
+	"errors"
+	"fmt"
 	"github.com/catfishlty/webhooks-hub/internal/common"
 	"github.com/catfishlty/webhooks-hub/internal/types"
 )
 
 func (db *DB) GetRule(id string) (types.Rule, error) {
 	var rule types.Rule
-	result := db.orm.Preload("Receive").Preload("Send").Where("id = ?", id).First(&rule)
+	result := db.orm.Where("uid = ?", id).First(&rule)
 	return rule, result.Error
 }
 
@@ -23,12 +25,26 @@ func (db *DB) GetRuleCount() int64 {
 	return count
 }
 
+func (db *DB) ExistRule(id string) error {
+	var count int64
+	db.orm.Model(&types.Rule{}).Where("uid = ?", id).Count(&count)
+	if count > 0 {
+		return nil
+	}
+	return errors.New(fmt.Sprintf("rule uid: %s not found", id))
+}
+
 func (db *DB) AddRule(request types.Rule) (string, error) {
 	result := db.orm.Create(&request)
-	return request.ID, result.Error
+	return request.UID, result.Error
+}
+
+func (db *DB) UpdateRule(request types.Rule) error {
+	result := db.orm.Model(&types.Rule{}).Where("uid = ?", request.UID).Updates(request)
+	return result.Error
 }
 
 func (db *DB) RemoveRule(id string) error {
-	result := db.orm.Select("Send", "Receive").Where("id = ?", id).Delete(&types.Rule{})
+	result := db.orm.Select("Send", "Receive").Where("uid = ?", id).Delete(&types.Rule{})
 	return result.Error
 }

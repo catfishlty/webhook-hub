@@ -19,10 +19,12 @@ func (*Hub) commonErrorHandler(errorType string) gin.HandlerFunc {
 	return gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
 		if customError := recovered.(*types.CommonError); customError != nil {
 			msg := customError.Msg
-			if msg == "" && customError.Err != nil {
-				msg = customError.Err.Error()
-			} else {
-				msg = "Unknown error"
+			if msg == "" {
+				if customError.Err != nil {
+					msg = customError.Err.Error()
+				} else {
+					msg = "Unknown error"
+				}
 			}
 			c.JSON(customError.Code, gin.H{
 				"message": msg,

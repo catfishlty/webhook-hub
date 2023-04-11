@@ -28,7 +28,7 @@ func (db *DB) Init() {
 }
 
 func (db *DB) Migrate() {
-	err := db.orm.AutoMigrate(&types.Rule{}, &types.ReceiveRequest{}, &types.SendRequest{}, &types.User{})
+	err := db.orm.AutoMigrate(&types.Rule{}, &types.User{})
 	if err != nil {
 		panic(err)
 	}

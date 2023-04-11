@@ -52,6 +52,7 @@ func (hub *Hub) initRouter(secretKey string) {
 		ruleGroup := apiGroup.Group("rule")
 		{
 			ruleGroup.POST("", hub.AddRuleHandler())
+			ruleGroup.PUT(":id", hub.UpdateRuleHandler())
 			ruleGroup.DELETE(":id", hub.DeleteRuleHandler())
 			ruleGroup.GET(":id", hub.GetRuleHandler())
 		}

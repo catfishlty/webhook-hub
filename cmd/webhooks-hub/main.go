@@ -49,7 +49,7 @@ func main() {
 			exp.HandleCmdWithMsg(p, err, "failed to get user list")
 			fmt.Printf("total users: %d\n", total)
 			for idx, user := range users {
-				fmt.Printf("%3d - user: id='%s', name='%s'", idx, user.Id, user.Username)
+				fmt.Printf("%3d - user: id='%s', name='%s'", idx, user.UID, user.Username)
 			}
 		case args.AdminCommand.ResetCommand != nil:
 			log.Debugf("command: Admin Reset")

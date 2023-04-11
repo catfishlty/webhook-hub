@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/catfishlty/webhooks-hub/internal/types"
 	"github.com/gin-gonic/gin"
-	"github.com/goccy/go-json"
 	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"regexp"
@@ -79,7 +78,7 @@ func getVariableValue(request *http.Request, data []byte, variable types.Variabl
 func getJsonVariableValue(data []byte, variable types.VariableItem) (string, error) {
 	keyList := strings.Split(variable.Key, ".")
 	var m map[string]any
-	err := json.Unmarshal(data, &m)
+	err := jsoniter.Unmarshal(data, &m)
 	if err != nil {
 		return "", err
 	}
