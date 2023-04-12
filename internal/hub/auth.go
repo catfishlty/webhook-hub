@@ -2,9 +2,9 @@ package hub
 
 import (
 	jwt "github.com/appleboy/gin-jwt/v2"
-	"github.com/catfishlty/webhooks-hub/internal/check"
-	"github.com/catfishlty/webhooks-hub/internal/common"
-	"github.com/catfishlty/webhooks-hub/internal/types"
+	"github.com/catfishlty/webhook-hub/internal/check"
+	"github.com/catfishlty/webhook-hub/internal/common"
+	"github.com/catfishlty/webhook-hub/internal/types"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"time"

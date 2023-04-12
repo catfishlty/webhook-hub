@@ -2,7 +2,7 @@ package hub
 
 import (
 	"errors"
-	"github.com/catfishlty/webhooks-hub/exp"
+	"github.com/catfishlty/webhook-hub/exp"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net"

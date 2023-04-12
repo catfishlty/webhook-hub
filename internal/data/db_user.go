@@ -2,8 +2,8 @@ package data
 
 import (
 	"errors"
-	"github.com/catfishlty/webhooks-hub/internal/types"
-	"github.com/catfishlty/webhooks-hub/internal/utils"
+	"github.com/catfishlty/webhook-hub/internal/types"
+	"github.com/catfishlty/webhook-hub/internal/utils"
 )
 
 func (db *DB) CheckUser(username, password string) (*types.User, error) {

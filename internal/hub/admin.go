@@ -2,11 +2,11 @@ package hub
 
 import (
 	"fmt"
-	"github.com/catfishlty/webhooks-hub/exp"
-	"github.com/catfishlty/webhooks-hub/internal/check"
-	"github.com/catfishlty/webhooks-hub/internal/common"
-	"github.com/catfishlty/webhooks-hub/internal/types"
-	"github.com/catfishlty/webhooks-hub/internal/utils"
+	"github.com/catfishlty/webhook-hub/exp"
+	"github.com/catfishlty/webhook-hub/internal/check"
+	"github.com/catfishlty/webhook-hub/internal/common"
+	"github.com/catfishlty/webhook-hub/internal/types"
+	"github.com/catfishlty/webhook-hub/internal/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"

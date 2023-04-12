@@ -3,8 +3,8 @@ package data
 import (
 	"errors"
 	"fmt"
-	"github.com/catfishlty/webhooks-hub/internal/common"
-	"github.com/catfishlty/webhooks-hub/internal/types"
+	"github.com/catfishlty/webhook-hub/internal/common"
+	"github.com/catfishlty/webhook-hub/internal/types"
 )
 
 func (db *DB) GetRule(id string) (types.Rule, error) {

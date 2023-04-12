@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/catfishlty/webhooks-hub/internal/check"
+	"github.com/catfishlty/webhook-hub/internal/check"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"gorm.io/datatypes"

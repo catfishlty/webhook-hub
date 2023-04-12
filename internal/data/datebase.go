@@ -1,8 +1,8 @@
 package data
 
 import (
-	"github.com/catfishlty/webhooks-hub/internal/common"
-	"github.com/catfishlty/webhooks-hub/internal/types"
+	"github.com/catfishlty/webhook-hub/internal/common"
+	"github.com/catfishlty/webhook-hub/internal/types"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )

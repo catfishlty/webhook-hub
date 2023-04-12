@@ -1,8 +1,8 @@
 package hub
 
 import (
-	"github.com/catfishlty/webhooks-hub/internal/common"
-	"github.com/catfishlty/webhooks-hub/internal/data"
+	"github.com/catfishlty/webhook-hub/internal/common"
+	"github.com/catfishlty/webhook-hub/internal/data"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"

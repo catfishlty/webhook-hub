@@ -1,4 +1,4 @@
-module github.com/catfishlty/webhooks-hub
+module github.com/catfishlty/webhook-hub
 
 go 1.20
 

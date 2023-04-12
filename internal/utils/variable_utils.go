@@ -3,8 +3,8 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"github.com/catfishlty/webhooks-hub/exp"
-	"github.com/catfishlty/webhooks-hub/internal/types"
+	"github.com/catfishlty/webhook-hub/exp"
+	"github.com/catfishlty/webhook-hub/internal/types"
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"
 	"net/http"

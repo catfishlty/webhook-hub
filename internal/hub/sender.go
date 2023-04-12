@@ -2,7 +2,7 @@ package hub
 
 import (
 	"errors"
-	"github.com/catfishlty/webhooks-hub/internal/types"
+	"github.com/catfishlty/webhook-hub/internal/types"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 )
